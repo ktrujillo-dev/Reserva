@@ -1,0 +1,15 @@
+<nav class="navbar">
+  <div class="navbar-left">
+    <button class="menu-btn" (click)="toggleSidebar()">☰</button>
+    <img src="../../../../assets/icon/logo_pink.svg" alt="Logo" class="logo" />
+    <span class="app-title">Gestor de Salas</span>
+  </div>
+
+  <div class="navbar-right" *ngIf="currentUser() as user">
+    <div class="user-info">
+      <img [src]="(user.avatar_url || '../../../../assets/icon/google.svg') | safeUrl" class="avatar" />
+      <span>{{ user.nombre | titlecase }}</span>
+    </div>
+    <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
+  </div>
+</nav>

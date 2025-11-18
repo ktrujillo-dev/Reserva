@@ -1,0 +1,69 @@
+<div class="container mt-4">
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gestión de Equipos</h1>
+    <button class="btn btn-primary" (click)="openModal()">+ Añadir Equipo</button>
+  </header>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Disponibilidad</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let equipo of equipos">
+          <td>{{ equipo.nombre }}</td>
+          <td>{{ equipo.descripcion }}</td>
+          <td>
+            <span class="badge" [ngClass]="equipo.disponible ? 'bg-success' : 'bg-secondary'">
+              {{ equipo.disponible ? 'Disponible' : 'No Disponible' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-outline-secondary me-2" (click)="openModal(equipo)">Editar</button>
+            <button class="btn btn-sm btn-outline-danger" (click)="onDelete(equipo.id)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para Crear/Editar Equipo -->
+<div class="modal" tabindex="-1" [ngStyle]="{'display': isModalVisible ? 'block' : 'none'}">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEditing ? 'Editar Equipo' : 'Añadir Nuevo Equipo' }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="equipoForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre del Equipo</label>
+            <input id="nombre" formControlName="nombre" type="text" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea id="descripcion" formControlName="descripcion" class="form-control"></textarea>
+          </div>
+          <div class="form-check mb-3" *ngIf="isEditing">
+            <input id="disponible" formControlName="disponible" type="checkbox" class="form-check-input">
+            <label for="disponible" class="form-check-label">Disponible</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="equipoForm.invalid">
+          {{ isEditing ? 'Guardar Cambios' : 'Crear Equipo' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show" *ngIf="isModalVisible"></div>

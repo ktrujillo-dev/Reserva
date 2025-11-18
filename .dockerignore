@@ -1,0 +1,25 @@
+# Ignorar dependencias locales
+node_modules
+*/node_modules
+
+# Ignorar artefactos de construcción
+dist
+.angular
+
+# Archivos de entorno
+.env
+
+# Ignorar logs de npm
+npm-debug.log
+
+# Ignorar archivos de Docker y Git
+.dockerignore
+.git
+.gitignore
+
+# Ignorar archivos del editor
+.vscode
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db

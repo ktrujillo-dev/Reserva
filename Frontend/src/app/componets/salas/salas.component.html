@@ -1,0 +1,68 @@
+<div class="container">
+  <header class="header">
+    <h1>Gestión de Salas</h1>
+    <button class="btn btn-primary" (click)="openModal()">+ Crear Sala</button>
+  </header>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Color</th>
+          <th>Nombre</th>
+          <th>Capacidad</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sala of salas">
+          <td><div class="color-dot" [style.backgroundColor]="sala.color || '#ccc'"></div></td>
+          <td>{{ sala.nombre }}</td>
+          <td>{{ sala.capacidad }}</td>
+          <td>{{ sala.descripcion }}</td>
+          <td>
+            <button class="btn btn-secondary" (click)="openModal(sala)">Editar</button>
+            <button class="btn btn-danger" (click)="onDelete(sala.id)">Desactivar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para Crear/Editar Sala -->
+<div class="modal-overlay" *ngIf="isModalVisible">
+  <div class="modal-content">
+    <h2>{{ isEditing ? 'Editar Sala' : 'Crear Nueva Sala' }}</h2>
+    <form [formGroup]="salaForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" formControlName="nombre" type="text" placeholder="Ej. Sala de Creatividad">
+      </div>
+      <!-- Agrupador para Capacidad y Color -->
+      <div class="form-group-inline">
+        <div class="form-group">
+          <label for="capacidad">Capacidad</label>
+          <input id="capacidad" formControlName="capacidad" type="number" placeholder="Ej. 10">
+        </div>
+        <div class="form-group">
+          <label for="color">Color</label>
+          <input id="color" formControlName="color" type="color" class="form-control-color">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" formControlName="descripcion" placeholder="Ej. Equipada con pizarra digital"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="calendar_id">ID de Calendario de Google (Opcional)</label>
+        <input id="calendar_id" formControlName="calendar_id" type="text">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="salaForm.invalid">{{ isEditing ? 'Actualizar' : 'Crear' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

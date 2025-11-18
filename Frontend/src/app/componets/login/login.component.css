@@ -1,0 +1,26 @@
+.login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 80vh;
+      text-align: center;
+    }
+    button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    button:hover {
+      background-color: #e9e9e9;
+    }
+    img {
+      width: 20px;
+      height: 20px;
+    }

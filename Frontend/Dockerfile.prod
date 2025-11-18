@@ -1,0 +1,24 @@
+# Etapa de construcción
+FROM node:22-alpine AS build
+WORKDIR /app
+
+COPY Frontend/package*.json ./
+RUN npm install
+
+COPY Frontend/ .
+# Construye la app SSR para producción
+RUN npm run build:ssr
+
+# Etapa de producción
+FROM node:22-alpine
+WORKDIR /app
+
+COPY --from=build /app/dist/Frontend/browser ./browser
+COPY --from=build /app/dist/Frontend/server ./server
+COPY --from=build /app/package*.json ./
+RUN npm install --omit=dev
+
+EXPOSE 4000
+
+# Comando para producción
+CMD ["node", "server/main.js"]

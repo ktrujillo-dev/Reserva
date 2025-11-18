@@ -1,0 +1,32 @@
+<div class="container-fluid p-4">
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4">Historial de Uso de Equipos</h2>
+  </header>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Equipo</th>
+              <th>Reservado por</th>
+              <th>Reunión</th>
+              <th>Sala</th>
+              <th>Fecha de Asignación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of historial">
+              <td>{{ item.equipo_nombre }}</td>
+              <td>{{ item.usuario_nombre }}</td>
+              <td>{{ item.reserva_titulo }}</td>
+              <td>{{ item.sala_nombre }}</td>
+              <td>{{ item.fecha_asignacion | date:'dd/MM/yy, h:mm a' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

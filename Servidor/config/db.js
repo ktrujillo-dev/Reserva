@@ -1,4 +1,6 @@
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
+const dotenv = require('dotenv');
+dotenv.config();
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -8,7 +10,7 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 15,
   queueLimit: 0,
-  connectTimeout: 20000, // 10 segundos
+  connectTimeout: 20000, // 20 segundos
 });
 
 // Verificación de la conexión al iniciar la aplicación

@@ -1,6 +1,7 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const express = require('express');
 const session = require('express-session');
-const dotenv = require("dotenv");
 const passport = require('passport');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -10,9 +11,6 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 require("./config/db.js");
-
-dotenv.config();
-
 
 const authRouter = require('./routes/auth');
 const salasRouter = require('./routes/salas');

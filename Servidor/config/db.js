@@ -1,15 +1,25 @@
 const mysql = require("mysql2");
 
 const pool = mysql.createPool({
-  host: "127.0.0.1", // o el host del contenedor
-  port: 3307,        // el puerto que mapeaste
-  user: "root",
-  password: "root",
-  database: "reserva_salas",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 50,
-  connectTimeout: 10000, // 10 segundos
+  connectionLimit: 15,
+  queueLimit: 0,
+  connectTimeout: 20000, // 10 segundos
 });
 
-module.exports = pool.promise();
+// Verificación de la conexión al iniciar la aplicación
+pool.getConnection()
+  .then(connection => {
+    console.log('✅ Conexión a la base de datos establecida con éxito.');
+    connection.release(); // Devolver la conexión al pool
+  })
+  .catch(err => {
+    console.error('❌ Error al conectar con la base de datos:', err.message);
+  });
+
+// Exportamos el pool directamente
+module.exports = pool;

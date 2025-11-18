@@ -1,6 +1,5 @@
-version: '3.8'
 services:
-  backend:
+  api:
     build:
       context: .
       dockerfile: Servidor/Dockerfile.prod
@@ -9,10 +8,8 @@ services:
       - "3000:3000"
     env_file:
       - .env
-    depends_on:
-      - db
     networks:
-      - app-network
+      - shared-network
     restart: unless-stopped
 
   frontend:
@@ -21,31 +18,13 @@ services:
       dockerfile: Frontend/Dockerfile.prod
     container_name: reserva-frontend-prod
     ports:
-      - "80:4000" # Exponer en el puerto 80 estándar para acceso web
+      - "4000:4000"
     depends_on:
-      - backend
+      - api
     networks:
-      - app-network
+      - shared-network
     restart: unless-stopped
-  
-  db:
-    image: mysql:8.0
-    container_name: reserva-db-prod
-    restart: always
-    env_file: .env # Asegúrate de que tu .env tenga las variables de DB_
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD} # Por ejemplo
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - app-network
-
-volumes:
-  db_data:
 
 networks:
-  app-network:
-    driver: bridge
+  shared-network:
+    external: true

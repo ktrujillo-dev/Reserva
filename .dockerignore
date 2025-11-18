@@ -1,24 +1,22 @@
-# Ignorar dependencias locales
-node_modules
-*/node_modules
+# Ignorar todas las dependencias locales y de cualquier subdirectorio
+**/node_modules
 
 # Ignorar artefactos de construcción
-dist
+**/dist
+**/coverage
 .angular
 
 # Archivos de entorno
 .env
 
-# Ignorar logs de npm
+# Logs y archivos del IDE
 npm-debug.log
+.vscode
+.idea
 
-# Ignorar archivos de Docker y Git
-.dockerignore
+# Archivos de Git
 .git
 .gitignore
-
-# Ignorar archivos del editor
-.vscode
 
 # Archivos de sistema operativo
 .DS_Store

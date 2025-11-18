@@ -7,9 +7,10 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -22,7 +23,7 @@ services:
     depends_on:
       - mysql
     ports:
-      - "8080:80" # Accederás a phpMyAdmin en http://<IP_DEL_SERVIDOR>:8080
+      - "8081:81"
     environment:
       - PMA_HOST=mysql # Le dice a phpMyAdmin que se conecte al servicio 'mysql'
       - PMA_PORT=3306

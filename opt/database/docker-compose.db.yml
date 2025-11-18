@@ -25,7 +25,7 @@ services:
     ports:
       - "8081:81"
     environment:
-      - PMA_HOST=mysql # Le dice a phpMyAdmin que se conecte al servicio 'mysql'
+      - PMA_HOST=mysql
       - PMA_PORT=3306
     networks:
       - shared-network

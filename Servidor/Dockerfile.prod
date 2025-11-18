@@ -2,14 +2,14 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copia solo package.json y package-lock.json desde la carpeta Servidor
-COPY Servidor/package*.json ./
+# Copia los archivos de dependencias desde la carpeta Servidor
+COPY ./Servidor/package*.json ./
 
 # Instala solo dependencias de producción
 RUN npm install --omit=dev
 
-# Copia el código fuente completo desde la carpeta Servidor
-COPY Servidor/ .
+# Copia todo el código fuente de la carpeta Servidor al directorio de trabajo /app
+COPY ./Servidor/ .
 
 # Expone el puerto de producción
 EXPOSE 3000

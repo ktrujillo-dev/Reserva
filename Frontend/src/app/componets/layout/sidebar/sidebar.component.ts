@@ -4,6 +4,12 @@ import { Router, RouterLink } from '@angular/router';
 import { LayoutService } from '../../../core/services/layout.service';
 import { AuthService } from '../../../core/services/auth.service';
 
+export const ROLES = {
+  ADMIN: 'administrador',
+  USER: 'user',
+};
+
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -16,14 +22,17 @@ export class SidebarComponent {
   layoutService = inject(LayoutService);
   authService = inject(AuthService);
 
+
+
+
   menuItems = [
-    { label: 'Dashboard', icon: '📊', route: '/admin/dashboard', roles: ['admin', 'user'] },
-    { label: 'Salas', icon: '🏢', route: '/admin/salas', roles: ['admin'] },
-    { label: 'Calendario', icon: '📅', route: '/admin/calendario', roles: ['admin', 'user'] },
-    { label: 'Equipos', icon: '🔌', route: '/admin/equipos', roles: ['admin'] },
-    { label: 'Historial Equipos', icon: '📜', route: '/admin/equipo-historial', roles: ['admin', 'user'] },
-    { label: 'Usuarios', icon: '👥', route: '/usuarios', roles: ['admin'] },
-    { label: 'Configuración', icon: '⚙️', route: '/configuracion', roles: ['admin'] },
+    { label: 'Dashboard', icon: '📊', route: '/admin/dashboard',  roles: [ROLES.ADMIN, ROLES.USER] },
+    { label: 'Salas', icon: '🏢', route: '/admin/salas',  roles: [ROLES.ADMIN] },
+    { label: 'Calendario', icon: '📅', route: '/admin/calendario', roles: [ROLES.ADMIN, ROLES.USER] },
+    { label: 'Equipos', icon: '🔌', route: '/admin/equipos',  roles: [ROLES.ADMIN]},
+    { label: 'Historial Equipos', icon: '📜', route: '/admin/equipo-historial', roles: [ROLES.ADMIN, ROLES.USER] },
+    { label: 'Usuarios', icon: '👥', route: '/usuarios',  roles: [ROLES.ADMIN] },
+    { label: 'Configuración', icon: '⚙️', route: '/configuracion',  roles: [ROLES.ADMIN] },
   ];
 
   get filteredMenuItems() {
@@ -31,6 +40,7 @@ export class SidebarComponent {
       item.roles.some(role => this.authService.hasRole(role))
     );
   }
+
 
   navigate(route: string): void {
     this.router.navigate([route]);

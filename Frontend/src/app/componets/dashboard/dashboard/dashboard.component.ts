@@ -3,7 +3,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { ReservasService, Reserva } from '../../../core/services/reservas.service';
-import { WebSocketService } from '../../../core/services/websocket.service';
 import Swal, { SweetAlertResult } from 'sweetalert2';
 
 @Component({
@@ -13,28 +12,14 @@ import Swal, { SweetAlertResult } from 'sweetalert2';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   authService = inject(AuthService);
   private reservasService = inject(ReservasService);
-  private webSocketService = inject(WebSocketService);
   
   reservasActivas: Reserva[] = [];
-  private websocketSubscription!: Subscription;
 
   ngOnInit(): void {
     this.loadMisReservasActivas();
-
-    // Escuchar eventos de WebSocket para actualizaciones en tiempo real
-    this.websocketSubscription = this.webSocketService.listen('reservas_actualizadas').subscribe(() => {
-      console.log('Dashboard: ¡Actualización de reservas recibida por WebSocket!');
-      this.loadMisReservasActivas();
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.websocketSubscription) {
-      this.websocketSubscription.unsubscribe();
-    }
   }
 
   loadMisReservasActivas(): void {

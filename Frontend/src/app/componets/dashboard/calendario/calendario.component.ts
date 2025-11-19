@@ -12,7 +12,6 @@ import { SalasService, Sala } from '../../../core/services/salas.service';
 import { DirectorioService, Contacto } from '../../../core/services/directorio.service';
 import { EquiposService, Equipo } from '../../../core/services/equipos.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { WebSocketService } from '../../../core/services/websocket.service';
 
 import Swal from 'sweetalert2';
 
@@ -30,7 +29,6 @@ export class CalendarioComponent implements OnInit, OnDestroy {
   private equiposService = inject(EquiposService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
-  private webSocketService = inject(WebSocketService); 
 
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView;
@@ -50,8 +48,6 @@ export class CalendarioComponent implements OnInit, OnDestroy {
   private searchTerms = new Subject<string>();
   invitados: Contacto[] = [];
 
-  private websocketSubscription!: Subscription;
-
   constructor() {
     this.reservaForm = this.fb.group({
       sala_id: [null, Validators.required],
@@ -69,12 +65,6 @@ export class CalendarioComponent implements OnInit, OnDestroy {
     this.loadSalas();
     this.loadEquipos();
 
-    // Escuchar eventos de WebSocket
-    this.websocketSubscription = this.webSocketService.listen('reservas_actualizadas').subscribe(() => {
-      console.log('¡Actualización de reservas recibida por WebSocket!');
-      this.loadReservas();
-    });
-
     this.searchSuggestions$ = this.searchTerms.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -83,10 +73,7 @@ export class CalendarioComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Desuscribirse para evitar fugas de memoria
-    if (this.websocketSubscription) {
-      this.websocketSubscription.unsubscribe();
-    }
+    // Lógica de limpieza si es necesaria en el futuro
   }
 
   get equiposFormArray() {

@@ -82,8 +82,6 @@ router.get('/hoy', protect, async (req, res) => {
 router.get('/mis-activas', protect, async (req, res) => {
   const currentUser = req.user;
   try {
-    const ahora = new Date();
-
     const [reservas] = await db.query(
       `SELECT DISTINCT
          r.id, r.titulo, r.descripcion, r.fecha_inicio, r.fecha_fin, r.meet_link,
@@ -99,10 +97,10 @@ router.get('/mis-activas', protect, async (req, res) => {
        LEFT JOIN reserva_invitados ri ON r.id = ri.reserva_id
        WHERE
          r.status = 'confirmada' AND
-         r.fecha_fin > ? AND
+         r.fecha_fin > CONVERT_TZ(NOW(), 'UTC', 'America/Mexico_City') AND
          (r.usuario_id = ? OR ri.invitado_email = ?)
        ORDER BY r.fecha_inicio`,
-      [ahora, currentUser.id, currentUser.email]
+      [currentUser.id, currentUser.email]
     );
 
     const resultado = reservas.map(r => ({
@@ -190,9 +188,6 @@ router.post('/', protect, async (req, res) => {
     
     await connection.commit();
     
-    // Emitir evento de WebSocket
-    req.app.get('io').emit('reservas_actualizadas', { message: 'Una nueva reserva ha sido creada.' });
-
     res.status(201).json({ id: newReservaId, ...newReserva });
 
   } catch (err) {
@@ -298,7 +293,6 @@ router.put('/:id', protect, async (req, res) => {
     }
 
     await connection.commit();
-    req.app.get('io').emit('reservas_actualizadas', { message: 'Una reserva ha sido modificada.' });
     res.status(200).json({ message: 'Reserva actualizada correctamente.' });
 
   } catch (err) {
@@ -357,9 +351,6 @@ router.delete('/:id', protect, async (req, res) => {
     await connection.query('DELETE FROM reservas WHERE id = ?', [reservaId]);
 
     await connection.commit();
-
-    // Emitir evento de WebSocket
-    req.app.get('io').emit('reservas_actualizadas', { message: 'Una reserva ha sido cancelada.' });
 
     res.status(200).json({ message: 'Reserva cancelada correctamente.' });
 

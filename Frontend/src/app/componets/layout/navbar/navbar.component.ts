@@ -20,7 +20,6 @@ export class NavbarComponent {
 
   constructor() {
     effect(() => {
-      console.log('Datos del usuario en Navbar:', this.currentUser());
     });
   }
 

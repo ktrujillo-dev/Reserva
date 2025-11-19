@@ -14,8 +14,7 @@ router.get("/google", passport.authenticate("google",{
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/gmail.send"
     ],
-    accessType: "offline",
-    prompt: "consent"
+    accessType: "offline"
 }));
 
 // Callback de Google

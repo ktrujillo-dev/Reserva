@@ -58,6 +58,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+app.get('/api/', (req, res) => {
+  res.send('API funcionando');
+});
+
 app.use('/api/auth', authRouter);
 app.use('/api/salas', salasRouter);
 app.use('/api/reservas', reservasRouter);

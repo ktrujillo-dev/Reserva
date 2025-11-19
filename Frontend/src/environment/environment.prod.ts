@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://177.244.49.174:4000/' 
+  apiUrl: 'https://reserva.fashionbeautygroup.com/api' 
 };

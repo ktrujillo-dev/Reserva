@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { LayoutService } from '../../../core/services/layout.service';
@@ -19,11 +19,9 @@ export const ROLES = {
 })
 export class SidebarComponent {
   private router = inject(Router);
-  layoutService = inject(LayoutService);
   authService = inject(AuthService);
-
-
-
+  
+  @Input() isCollapsed = false;
 
   menuItems = [
     { label: 'Dashboard', icon: '📊', route: '/admin/dashboard',  roles: [ROLES.ADMIN, ROLES.USER] },

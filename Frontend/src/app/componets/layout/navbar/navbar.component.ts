@@ -1,8 +1,7 @@
-import { Component, inject, effect } from '@angular/core';
+import { Component, inject, EventEmitter, Output } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { LayoutService } from '../../../core/services/layout.service';
 import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
 
 @Component({
@@ -14,17 +13,15 @@ import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
 })
 export class NavbarComponent {
   private authService = inject(AuthService);
-  private layoutService = inject(LayoutService);
 
   currentUser = this.authService.currentUser;
 
-  constructor() {
-    effect(() => {
-    });
-  }
+  // DEFINIMOS EL EVENTO DE SALIDA
+  @Output() toggleSidebar = new EventEmitter<void>();
 
-  toggleSidebar(): void {
-    this.layoutService.toggleSidebar();
+  // ESTA ES LA FUNCIÓN QUE LLAMA TU BOTÓN HTML
+  onToggleSidebar() {
+    this.toggleSidebar.emit(); // Emite la señal al padre (MainLayout)
   }
 
   logout(): void {

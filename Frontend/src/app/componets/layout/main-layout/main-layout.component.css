@@ -1,17 +1,50 @@
-.layout {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+#wrapper {
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
 }
 
-.layout-body {
-  display: flex;
-  flex: 1;
+/* --- ESCRITORIO NORMAL --- */
+#sidebar-wrapper {
+  min-height: 100vh;
+  width: 220px; /* Ancho expandido */
+  transition: width 0.3s ease, margin 0.3s ease; /* Animación suave */
 }
 
-.content {
-  flex: 1;
-  padding: 20px;
-  background-color: #ffffff;
-  overflow-y: auto;
+/* --- ESCRITORIO COLAPSADO (MINI) --- */
+#sidebar-wrapper.collapsed-wrapper {
+  width: 80px; /* Ancho mini (debe coincidir con el css del sidebar.collapsed) */
+}
+
+#page-content-wrapper {
+  width: 100%;
+}
+
+/* --- MÓVIL --- */
+@media (max-width: 768px) {
+  #sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1050;
+    width: 250px; /* Ancho fijo en móvil */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+  }
+  
+  /* En móvil ignoramos la clase collapsed-wrapper, siempre queremos que se vea completo */
+  #sidebar-wrapper.collapsed-wrapper {
+    width: 250px; 
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    backdrop-filter: blur(2px);
+  }
 }

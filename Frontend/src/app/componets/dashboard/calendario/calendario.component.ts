@@ -153,14 +153,44 @@ export class CalendarioComponent implements OnInit, OnDestroy {
     this.reservasService.getReservas(start, end)
       .pipe(
         map((reservas: Reserva[]): CalendarEvent[] => {
+          // 1. Obtenemos el usuario actual UNA sola vez
+          const currentUser = this.authService.currentUser();
+
           return reservas.map((reserva: Reserva) => {
             const colorPrimario = reserva.sala_color || '#1e90ff';
+
+            //Detectar si hay equipos
+            // (Aseguramos que sea un array o string no vacío)
+            const equiposAny = reserva.equipos as any;
+            const hasEquipos = (Array.isArray(equiposAny) && equiposAny.length > 0) || (typeof equiposAny === 'string' && equiposAny.length > 0);
+
+            // 2. Definir el icono visual
+            const equipoIcon = hasEquipos ? '💻 ' : '';
+
+            // 2.  LÓGICA DE PRIVACIDAD y idicador de quipos
+            const isOwner = currentUser?.id === reserva.usuario_id;
+            // Verificamos si el email del usuario está en la lista de invitados
+            // Usamos ?. y || '' por seguridad si invitados viene null
+            const isInvited = reserva.invitados?.includes(currentUser?.email || '');
+            const isAdmin = currentUser?.roles?.includes('admin'); // Opcional: si el admin debe ver todo
+
+            let displayTitle = '';
+
+            // Si es el dueño, está invitado o es admin -> Ve el título real
+            if (isOwner || isInvited || isAdmin) {
+                displayTitle = `${equipoIcon}${reserva.titulo} (${reserva.sala_nombre})`;
+            } else {
+                // Si es un tercero -> Ve "Ocupado"
+                displayTitle = `${equipoIcon}Ocupado (${reserva.sala_nombre})`;
+            }
+            
+
             // Conversión explícita para asegurar que el calendario lo pinte bien
             return {
               id: reserva.id,
               start: new Date(reserva.fecha_inicio),
               end: new Date(reserva.fecha_fin),
-              title: `${reserva.titulo} (${reserva.sala_nombre})`,
+              title: displayTitle,
               color: { 
                 primary: colorPrimario, 
                 secondary: this.hexToRgba(colorPrimario, 0.3),
@@ -228,7 +258,7 @@ export class CalendarioComponent implements OnInit, OnDestroy {
         fecha_inicio: this.formatToLocalDateTime(new Date(reserva.fecha_inicio)),
         fecha_fin: this.formatToLocalDateTime(new Date(reserva.fecha_fin)),
         equipos: equipoValues
-      }, { emitEvent: false }); // <--- CLAVE AQUÍ
+      }, { emitEvent: false });
 
       if (reserva.invitados && reserva.invitados.length > 0) {
         this.directorioService.getContactosByEmails(reserva.invitados).subscribe((contactos: Contacto[]) => {
@@ -365,10 +395,13 @@ export class CalendarioComponent implements OnInit, OnDestroy {
     const currentUser = this.authService.currentUser();
     const isOwner = currentUser?.id === reserva.usuario_id;
     const isInvited = reserva.invitados?.includes(currentUser?.email || '');
+    const isAdmin = currentUser?.roles?.includes('admin');
 
+    let displayTitle = '';
     let detailsHtml = '';
 
-    if (isOwner || isInvited) {
+    if (isOwner || isInvited || isAdmin) {
+      displayTitle = `${reserva.titulo} (${reserva.sala_nombre})`;
       const invitadosHtml = reserva.invitados && reserva.invitados.length > 0
         ? `<ul>${reserva.invitados.map((email: string) => `<li>${email}</li>`).join('')}</ul>`
         : '<p>No hay invitados adicionales.</p>';
@@ -386,6 +419,7 @@ export class CalendarioComponent implements OnInit, OnDestroy {
         ${equipoHtml}
       `;
     } else {
+      displayTitle = `Ocupado (${reserva.sala_nombre})`;
       detailsHtml = `
         <hr>
         <p><i>No tienes permiso para ver los detalles de esta reunión.</i></p>
@@ -393,7 +427,7 @@ export class CalendarioComponent implements OnInit, OnDestroy {
     }
 
     Swal.fire({
-      title: reserva.titulo,
+      title: displayTitle,
       html: `
         <div style="text-align: left; padding: 0 1rem;">
           <p><strong>Sala:</strong> ${reserva.sala_nombre}</p>

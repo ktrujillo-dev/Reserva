@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, F
 import { CalendarModule, CalendarView, CalendarEvent } from 'angular-calendar';
 import { startOfDay, endOfDay, isSameMonth, isSameDay, addMinutes, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { Subject, Observable, Subscription } from 'rxjs';
-import { map, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { map, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators'; // Agregamos takeUntil
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ReservasService, Reserva } from '../../../core/services/reservas.service';
@@ -37,6 +37,9 @@ export class CalendarioComponent implements OnInit, OnDestroy {
   filteredEvents: CalendarEvent[] = [];
   selectedSalaId: number | null = null;
   refresh = new Subject<void>();
+  
+  // Subject para cancelar suscripciones al destruir el componente
+  private destroy$ = new Subject<void>(); 
 
   isModalVisible = false;
   editingReservaId: number | null = null;
@@ -70,10 +73,32 @@ export class CalendarioComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       switchMap((term: string) => this.directorioService.search(term))
     );
+
+    // --- MEJORA DE UX: Sincronizar Fechas ---
+    // Cada vez que cambia 'fecha_inicio', calculamos 'fecha_fin' + 1 hora
+    this.reservaForm.get('fecha_inicio')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((inicioValue) => {
+        if (inicioValue) {
+          // Crear fecha basada en el input (que es texto local)
+          const startDate = new Date(inicioValue);
+          
+          // Sumar 60 minutos (1 hora)
+          const endDate = addMinutes(startDate, 60);
+          
+          // Formatear para el input html
+          const formattedEnd = this.formatToLocalDateTime(endDate);
+          
+          // Actualizar fecha_fin sin disparar eventos (para evitar loops si tuvieras lógica inversa)
+          // Solo lo hacemos si NO estamos en modo edición cargando datos iniciales (lo manejamos con cuidado en openModal)
+          this.reservaForm.get('fecha_fin')?.setValue(formattedEnd);
+        }
+      });
   }
 
   ngOnDestroy(): void {
-    // Lógica de limpieza si es necesaria en el futuro
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get equiposFormArray() {
@@ -100,7 +125,6 @@ export class CalendarioComponent implements OnInit, OnDestroy {
   loadEquipos(): void {
     this.equiposService.getEquipos().subscribe((data: Equipo[]) => {
       this.equipos = data;
-      // Una vez cargados los equipos, reconstruimos el FormArray para que coincida
       this.equiposFormArray.clear();
       this.equipos.forEach(() => this.equiposFormArray.push(this.fb.control(false)));
     });
@@ -131,6 +155,7 @@ export class CalendarioComponent implements OnInit, OnDestroy {
         map((reservas: Reserva[]): CalendarEvent[] => {
           return reservas.map((reserva: Reserva) => {
             const colorPrimario = reserva.sala_color || '#1e90ff';
+            // Conversión explícita para asegurar que el calendario lo pinte bien
             return {
               id: reserva.id,
               start: new Date(reserva.fecha_inicio),
@@ -138,8 +163,8 @@ export class CalendarioComponent implements OnInit, OnDestroy {
               title: `${reserva.titulo} (${reserva.sala_nombre})`,
               color: { 
                 primary: colorPrimario, 
-                secondary: this.hexToRgba(colorPrimario, 0.3), // Fondo translúcido
-                secondaryText: '#111' // Texto oscuro para legibilidad
+                secondary: this.hexToRgba(colorPrimario, 0.3),
+                secondaryText: '#111'
               },
               meta: { reserva: reserva },
             };
@@ -168,38 +193,43 @@ export class CalendarioComponent implements OnInit, OnDestroy {
     }
   }
 
+  // --- CORRECCIÓN 3: Formateador Robusto para Inputs ---
   private formatToLocalDateTime(date: Date): string {
-    // Esta función auxiliar formatea una fecha al formato YYYY-MM-DDTHH:mm
-    // que es el que espera el input datetime-local, respetando la zona horaria local.
-    const pad = (num: number) => num.toString().padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    const d = new Date(date);
+    // IMPORTANTE: Usamos getFullYear/getMonth/etc locales, NO getUTC...
+    // Queremos que el input muestre la hora "del reloj del usuario"
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
   openModal(date?: Date, reserva?: Reserva): void {
     this.reservaForm.reset();
     this.invitados = [];
     this.editingReservaId = null;
-
-    // Resetear los checkboxes a 'false' sin destruir los controles
     this.equiposFormArray.reset(this.equipos.map(() => false));
 
     if (reserva) {
       // MODO EDICIÓN
       this.editingReservaId = reserva.id;
 
-      // Crear el array de valores para los checkboxes
       const equipoValues = this.equipos.map(equipo => 
         reserva.equipos?.includes(equipo.nombre) || false
       );
       
+      // PatchValue con emitEvent: false para que NO se dispare el cálculo automático de hora fin
+      // y respete la hora de fin real que viene de la base de datos.
       this.reservaForm.patchValue({
         ...reserva,
         fecha_inicio: this.formatToLocalDateTime(new Date(reserva.fecha_inicio)),
         fecha_fin: this.formatToLocalDateTime(new Date(reserva.fecha_fin)),
-        equipos: equipoValues // <-- Asignar los valores correctos
-      });
+        equipos: equipoValues
+      }, { emitEvent: false }); // <--- CLAVE AQUÍ
 
-      // Cargar invitados
       if (reserva.invitados && reserva.invitados.length > 0) {
         this.directorioService.getContactosByEmails(reserva.invitados).subscribe((contactos: Contacto[]) => {
             this.invitados = contactos;
@@ -209,12 +239,15 @@ export class CalendarioComponent implements OnInit, OnDestroy {
     } else {
       // MODO CREACIÓN
       const startDate = date || new Date();
+      // Redondear minutos para que se vea bonito (opcional, ej: 10:00 en vez de 10:14)
+      startDate.setSeconds(0, 0);
+      
       const endDate = addMinutes(startDate, 60);
 
       this.reservaForm.patchValue({
         fecha_inicio: this.formatToLocalDateTime(startDate),
         fecha_fin: this.formatToLocalDateTime(endDate)
-      });
+      }, { emitEvent: false }); // También evitamos disparo innecesario al abrir
     }
 
     this.isModalVisible = true;
@@ -224,10 +257,21 @@ export class CalendarioComponent implements OnInit, OnDestroy {
     this.isModalVisible = false;
   }
 
+  // --- CORRECCIÓN 2: Envío de Fechas Correctas (ISO/UTC) ---
   onSubmit(): void {
     if (this.reservaForm.invalid) return;
 
     const formValue = this.reservaForm.value;
+    
+    // 1. Convertir Strings del Input a Objetos Date (Hora Local)
+    const fechaInicioDate = new Date(formValue.fecha_inicio);
+    const fechaFinDate = new Date(formValue.fecha_fin);
+
+    // 2. Convertir a ISO String (UTC) para el Backend
+    // Esto soluciona el problema de las horas que se movían.
+    const fechaInicioISO = fechaInicioDate.toISOString();
+    const fechaFinISO = fechaFinDate.toISOString();
+
     const invitadosEmails = this.invitados.map(i => i.email);
     
     const currentUserEmail = this.authService.currentUser()?.email;
@@ -241,12 +285,19 @@ export class CalendarioComponent implements OnInit, OnDestroy {
 
     const reservaData = {
       ...formValue,
+      fecha_inicio: fechaInicioISO, // Enviamos la ISO
+      fecha_fin: fechaFinISO,       // Enviamos la ISO
       invitados: invitadosEmails,
       equipos: selectedEquipoIds
     };
 
+    // Validación extra de seguridad frontend
+    if (fechaFinDate <= fechaInicioDate) {
+      Swal.fire('Horario inválido', 'La hora de fin debe ser posterior a la de inicio.', 'warning');
+      return;
+    }
+
     if (this.editingReservaId) {
-      // Lógica de Actualización
       this.reservasService.updateReserva(this.editingReservaId, reservaData).subscribe({
         next: () => {
           this.loadReservas();
@@ -258,13 +309,12 @@ export class CalendarioComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      // Lógica de Creación
       this.reservasService.createReserva(reservaData).subscribe({
         next: (response: any) => {
           this.loadReservas();
           this.closeModal();
           const successMsg = response.status === 202 
-            ? { title: 'Solicitud Enviada', text: 'El horario está ocupado. Se ha enviado una solicitud de traspaso.', icon: 'info' as const }
+            ? { title: 'Solicitud Enviada', text: 'El horario está ocupado. Solicitud enviada.', icon: 'info' as const }
             : { title: '¡Reservado!', text: 'Tu reunión ha sido agendada.', icon: 'success' as const };
           Swal.fire(successMsg);
         },
@@ -281,7 +331,6 @@ export class CalendarioComponent implements OnInit, OnDestroy {
 
   handleEventClick(event: CalendarEvent<{ reserva: Reserva }>): void {
     if (!event.meta?.reserva) {
-      console.error('El evento del calendario no tiene metadatos de reserva válidos.');
       return;
     }
     const reserva = event.meta.reserva;

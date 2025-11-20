@@ -22,10 +22,39 @@ export class DashboardComponent implements OnInit {
     this.loadMisReservasActivas();
   }
 
-  loadMisReservasActivas(): void {
+loadMisReservasActivas(): void {
     this.reservasService.getMisReservasActivas().subscribe(data => {
-      // Ordenar las reservas por fecha de inicio
-      this.reservasActivas = data.sort((a, b) => 
+      
+      // 1. Transformamos los datos antes de asignarlos
+      const reservasFormateadas = data.map(reserva => {
+        
+        // Corrección EQUIPOS: Si viene como string "A,B", lo convertimos a array ["A","B"]
+        let equiposArray: string[] = [];
+        if (typeof reserva.equipos === 'string') {
+            // @ts-ignore: Si TS se queja, forzamos el tipo string para el split
+            equiposArray = (reserva.equipos as string).split(',');
+        } else if (Array.isArray(reserva.equipos)) {
+            equiposArray = reserva.equipos;
+        }
+
+        // Corrección INVITADOS: (Por seguridad, hacemos lo mismo)
+        let invitadosArray: string[] = [];
+        if (typeof reserva.invitados === 'string') {
+             // @ts-ignore
+            invitadosArray = (reserva.invitados as string).split(',');
+        } else if (Array.isArray(reserva.invitados)) {
+            invitadosArray = reserva.invitados;
+        }
+
+        return {
+          ...reserva,
+          equipos: equiposArray,
+          invitados: invitadosArray
+        };
+      });
+
+      // 2. Ordenamos y asignamos
+      this.reservasActivas = reservasFormateadas.sort((a, b) => 
         new Date(a.fecha_inicio).getTime() - new Date(b.fecha_inicio).getTime()
       );
     });

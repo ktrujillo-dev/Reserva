@@ -11,7 +11,6 @@
             <tr>
               <th>Equipo</th>
               <th>Reservado por</th>
-              <th>Reunión</th>
               <th>Sala</th>
               <th>Fecha de Asignación</th>
             </tr>
@@ -20,7 +19,6 @@
             <tr *ngFor="let item of historial">
               <td>{{ item.equipo_nombre }}</td>
               <td>{{ item.usuario_nombre }}</td>
-              <td>{{ item.reserva_titulo }}</td>
               <td>{{ item.sala_nombre }}</td>
               <td>{{ item.fecha_asignacion | date:'dd/MM/yy, h:mm a' }}</td>
             </tr>

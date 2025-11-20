@@ -19,7 +19,7 @@ export interface Reserva {
   sala_color?: string;
   usuario_nombre?: string;
   invitados?: string[];
-  equipos?: string[];
+  equipos?: string[] ;
 }
 
 // Para crear una nueva reserva

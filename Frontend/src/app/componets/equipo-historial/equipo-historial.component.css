@@ -1,1 +1,55 @@
-/* Estilos para la tabla de historial si son necesarios */
+:host {
+  display: block;
+  /* El padding lo maneja el container-fluid */
+}
+
+/* Estilo de Tarjeta idéntico al Dashboard */
+.card {
+  border-radius: 12px;
+  background-color: var(--card-background-color, #fff);
+}
+
+/* Ajustes de Tabla */
+.table th {
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 16px;
+  background-color: #f8f9fa; /* Fondo gris muy suave para cabecera */
+  border-bottom: 1px solid #eee;
+}
+
+.table td {
+  font-size: 0.95rem;
+  padding: 12px 16px;
+  color: #333;
+}
+
+/* RESPONSIVE (MÓVIL) */
+@media (max-width: 768px) {
+  .h3 {
+    font-size: 1.5rem;
+  }
+  
+  /* Reducir un poco el padding de celdas para ver más info */
+  .table th, .table td {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Truco visual para indicar scroll horizontal (Sombra a los lados) */
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+  background: 
+    linear-gradient(to right, white 30%, rgba(255,255,255,0)),
+    linear-gradient(to right, rgba(255,255,255,0), white 70%) 0 100%,
+    radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.15), rgba(0,0,0,0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.15), rgba(0,0,0,0)) 0 100%;
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-attachment: local, local, scroll, scroll;
+}

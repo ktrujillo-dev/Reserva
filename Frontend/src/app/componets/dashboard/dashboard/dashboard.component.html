@@ -1,48 +1,74 @@
-<div class="container-fluid p-4">
-  <header class="mb-4">
-    <h1 class="h3">Bienvenido, {{ authService.currentUser()?.nombre }}</h1>
-    <p class="text-muted">Resumen de tus próximas reuniones.</p>
+<div class="container-fluid p-3 p-md-4">
+  
+  <header class="mb-3 mb-md-4">
+    <h1 class="h3 mb-1 text-truncate">Bienvenido, {{ authService.currentUser()?.nombre | titlecase }}</h1>
+    <p class="text-muted small mb-0">Resumen de tus próximas reuniones.</p>
   </header>
 
-  <div class="card shadow-sm">
-    <div class="card-header">
-      <h2 class="h5 mb-0">Próximas Reuniones</h2>
+  <div class="card shadow-sm border-0 overflow-hidden">
+    <div class="card-header bg-white py-3 border-bottom">
+      <h2 class="h5 mb-0 text-primary">Próximas Reuniones</h2>
     </div>
+    
     <div class="card-body p-0">
+      
       <div *ngIf="reservasActivas.length > 0; else noReservas" class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-          <thead>
+          <thead class="bg-light text-secondary">
             <tr>
-              <th>Título</th>
-              <th>Sala</th>
-              <th>Fecha</th>
-              <th>Horario</th>
-              <th>Organizador</th>
-              <th class="text-end">Acciones</th>
+              <th class="ps-4 text-uppercase small fw-bold" style="min-width: 150px;">Título</th>
+              <th style="min-width: 100px;">Sala</th>
+              <th style="min-width: 100px;">Fecha</th>
+              <th style="min-width: 140px;">Horario</th>
+              <th style="min-width: 120px;">Organizador</th>
+              <th class="text-end pe-4">Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let reserva of reservasActivas">
-              <td>{{ reserva.titulo }}</td>
-              <td>
-                <span class="d-inline-block rounded-circle me-2" [style.background-color]="reserva.sala_color || '#ccc'" style="width: 10px; height: 10px;"></span>
-                {{ reserva.sala_nombre }}
+              <td class="ps-4 fw-medium">
+                {{ reserva.titulo }}
+                <div class="d-md-none text-muted small mt-1">
+                   {{ reserva.sala_nombre }}
+                </div>
               </td>
-              <td>{{ reserva.fecha_inicio | date:'dd/MM/yy' }}</td>
-              <td>{{ reserva.fecha_inicio | date:'h:mm a' }} - {{ reserva.fecha_fin | date:'h:mm a' }}</td>
-              <td>{{ reserva.usuario_nombre }}</td>
-              <td class="text-end">
-                <button class="btn btn-sm btn-outline-primary" (click)="showReservaDetails(reserva)">
-                  Ver Detalles
+              
+              <td>
+                <span class="badge rounded-pill bg-light text-dark border">
+                  <span class="d-inline-block rounded-circle me-1" 
+                        [style.background-color]="reserva.sala_color || '#ccc'" 
+                        style="width: 8px; height: 8px;"></span>
+                  {{ reserva.sala_nombre }}
+                </span>
+              </td>
+              
+              <td class="text-nowrap">{{ reserva.fecha_inicio | date:'dd/MM/yy' }}</td>
+              
+              <td class="text-nowrap small">
+                {{ reserva.fecha_inicio | date:'h:mm a' }} - {{ reserva.fecha_fin | date:'h:mm a' }}
+              </td>
+              
+              <td>
+                <div class="d-flex align-items-center">
+                   <span class="text-truncate" style="max-width: 120px;">{{ reserva.usuario_nombre | titlecase }}</span>
+                </div>
+              </td>
+              
+              <td class="text-end pe-4">
+                <button class="btn btn-sm btn-outline-primary px-3" (click)="showReservaDetails(reserva)">
+                  Ver
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
       <ng-template #noReservas>
         <div class="text-center p-5">
-          <p class="text-muted">No tienes próximas reuniones programadas.</p>
+          <div class="mb-3 text-muted" style="font-size: 3rem;">📅</div>
+          <h3 class="h6 text-secondary">No tienes reuniones próximas</h3>
+          <p class="text-muted small">Disfruta tu tiempo libre.</p>
         </div>
       </ng-template>
     </div>

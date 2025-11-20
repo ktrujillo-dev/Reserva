@@ -1,2 +1,72 @@
-/* Usaremos clases de Bootstrap y estilos globales, 
-   por lo que no se necesitan estilos específicos para este componente por ahora. */
+:host {
+  display: block;
+  /* Padding manejado por container-fluid */
+}
+
+/* Estilo de la Tarjeta */
+.card {
+  border-radius: 12px; /* Bordes más suaves estilo iOS/Android moderno */
+  background-color: var(--card-background-color, #fff);
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+/* Ajustes de la Tabla */
+.table th {
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+/* Badge de la sala */
+.badge {
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* --- RESPONSIVE (MÓVIL) --- */
+@media (max-width: 768px) {
+  
+  /* Ajustar tamaños de fuente para que quepa más info */
+  .table th, .table td {
+    font-size: 0.85rem;
+    padding: 10px 12px; /* Reducir padding de celdas */
+  }
+
+  .card-header {
+    padding: 12px 16px;
+  }
+
+  .h3 { font-size: 1.5rem; } /* Título de bienvenida más chico */
+  
+  /* Ajuste del botón */
+  .btn-sm {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Truco visual para el scroll de la tabla */
+.table-responsive {
+  /* Scroll suave */
+  -webkit-overflow-scrolling: touch; 
+  /* Sombra sutil a los lados para indicar que hay más contenido */
+  background: 
+    linear-gradient(to right, white 30%, rgba(255,255,255,0)),
+    linear-gradient(to right, rgba(255,255,255,0), white 70%) 0 100%,
+    radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.2), rgba(0,0,0,0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-attachment: local, local, scroll, scroll;
+}

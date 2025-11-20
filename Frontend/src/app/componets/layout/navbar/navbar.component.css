@@ -76,3 +76,32 @@
   background-color: var(--primary-hover-color);
 }
 
+@media (max-width: 768px) {
+  /* Ocultar el nombre de la App en tablets y móviles para dar espacio */
+  .app-title {
+    display: none;
+  }
+
+  /* Ocultar el nombre del usuario, dejar solo la foto */
+  .user-info span {
+    display: none;
+  }
+
+  /* Reducir el padding para aprovechar espacio */
+  .navbar {
+    padding: 12px 16px;
+  }
+  
+  /* Reducir espacio entre elementos */
+  .navbar-right, .navbar-left {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* En pantallas muy pequeñas, ajustamos el botón de salir */
+  .logout-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}

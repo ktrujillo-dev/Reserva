@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+ import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -15,7 +15,33 @@ import { LayoutService } from '../../../core/services/layout.service';
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.css'
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements OnInit {
   authService = inject(AuthService);
-  layoutService = inject(LayoutService);
+
+  isSidebarOpen = true;
+  isMobile = false;
+
+  ngOnInit() {
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize', [])
+  onResize() {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    // 768px es el punto de quiebre "md" estándar de Bootstrap
+    this.isMobile = window.innerWidth < 768;
+
+    if (!this.isMobile) {
+      this.isSidebarOpen = true; // En escritorio siempre visible por defecto
+    } else {
+      this.isSidebarOpen = false; // En móvil oculto por defecto
+    }
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 }

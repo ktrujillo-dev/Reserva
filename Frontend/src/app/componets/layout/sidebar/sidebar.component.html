@@ -1,4 +1,4 @@
-<aside class="sidebar" [class.collapsed]="layoutService.isSidebarCollapsed()">
+<aside class="sidebar" [class.collapsed]="isCollapsed">
   <ul>
     <li *ngFor="let item of filteredMenuItems" (click)="navigate(item.route)">
       <span class="icon">{{ item.icon }}</span>

@@ -1,15 +1,24 @@
-.sidebar {
-  width: 220px;
-  background-color: #f7f9fc;
-  height: calc(100vh - 64px); /* Ajustado a la altura de la nueva navbar */
-  border-right: 1px solid #e0e0e0;
-  transition: width 0.3s ease;
-  overflow-x: hidden;
-  padding-top: 16px;
+/* El host ocupa el 100% del contenedor padre */
+:host {
+  display: block;
+  height: 100%;
 }
 
-.sidebar.collapsed {
-  width: 80px;
+.sidebar {
+  background-color: #f7f9fc;
+  /* ALTURA: Ocupa todo el espacio disponible del contenedor padre */
+  height: 100%; 
+  /* ANCHO: Se adapta al padre (#sidebar-wrapper), no lo forzamos aquí */
+  width: 100%;  
+  border-right: 1px solid #e0e0e0;
+  
+  /* SCROLL: Vital para ver todos los items en móviles pequeños */
+  overflow-y: auto; 
+  overflow-x: hidden;
+  
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar ul {
@@ -24,7 +33,7 @@
   padding: 14px 24px;
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
-  white-space: nowrap; /* Evita que el texto se rompa */
+  white-space: nowrap;
 }
 
 .sidebar li:hover {
@@ -35,7 +44,7 @@
 .icon {
   margin-right: 16px;
   font-size: 20px;
-  width: 24px; /* Ancho fijo para alineación */
+  width: 24px;
   text-align: center;
   transition: margin 0.3s ease;
 }
@@ -45,19 +54,17 @@
   opacity: 1;
 }
 
-/* Estilos para el estado colapsado */
-.sidebar.collapsed li {
-  justify-content: center;
-  padding: 14px 0;
-}
-
+/* Estilos para cuando está colapsado (solo aplica si el padre reduce el ancho) */
 .sidebar.collapsed .icon {
   margin-right: 0;
 }
 
 .sidebar.collapsed .label {
   opacity: 0;
-  width: 0;
-  overflow: hidden;
+  display: none; /* Importante para que no ocupe espacio fantasma */
 }
 
+.sidebar.collapsed li {
+  justify-content: center;
+  padding: 14px 0;
+}

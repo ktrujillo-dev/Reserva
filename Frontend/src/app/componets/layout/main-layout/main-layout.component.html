@@ -1,12 +1,21 @@
-<div class="layout">
-  <app-navbar></app-navbar>
+<div class="d-flex" id="wrapper">
+  
+  <div class="overlay" *ngIf="isMobile && isSidebarOpen" (click)="toggleSidebar()"></div>
 
-  <div class="layout-body">
-    <app-sidebar></app-sidebar>
-    <main class="content">
-      <router-outlet></router-outlet>
-    </main>
+  <div class="border-end bg-white" id="sidebar-wrapper" 
+       [class.d-none]="isMobile && !isSidebarOpen"
+       [class.collapsed-wrapper]="!isMobile && !isSidebarOpen">
+       
+       <app-sidebar [isCollapsed]="!isMobile && !isSidebarOpen"></app-sidebar>
   </div>
 
-  <app-footer></app-footer>
+  <div id="page-content-wrapper" class="w-100">
+    <app-navbar (toggleSidebar)="toggleSidebar()"></app-navbar>
+    
+    <div class="container-fluid mt-3">
+      <router-outlet></router-outlet>
+    </div>
+    
+    <app-footer></app-footer>
+  </div>
 </div>

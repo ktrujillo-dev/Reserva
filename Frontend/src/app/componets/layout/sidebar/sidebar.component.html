@@ -1,7 +1,7 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed">
   <ul>
     <li *ngFor="let item of filteredMenuItems" (click)="navigate(item.route)">
-      <span class="icon">{{ item.icon }}</span>
+      <span class="material-icons icon">{{ item.icon }}</span>
       <span class="label">{{ item.label }}</span>
     </li>
   </ul>

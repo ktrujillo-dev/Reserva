@@ -24,13 +24,13 @@ export class SidebarComponent {
   @Input() isCollapsed = false;
 
   menuItems = [
-    { label: 'Dashboard', icon: '📊', route: '/admin/dashboard',  roles: [ROLES.ADMIN, ROLES.USER] },
-    { label: 'Salas', icon: '🏢', route: '/admin/salas',  roles: [ROLES.ADMIN] },
-    { label: 'Calendario', icon: '📅', route: '/admin/calendario', roles: [ROLES.ADMIN, ROLES.USER] },
-    { label: 'Equipos', icon: '🔌', route: '/admin/equipos',  roles: [ROLES.ADMIN]},
-    { label: 'Historial Equipos', icon: '📜', route: '/admin/equipo-historial', roles: [ROLES.ADMIN, ROLES.USER] },
-    { label: 'Usuarios', icon: '👥', route: '/usuarios',  roles: [ROLES.ADMIN] },
-    { label: 'Configuración', icon: '⚙️', route: '/configuracion',  roles: [ROLES.ADMIN] },
+    { label: 'Dashboard', icon: 'dashboard', route: '/admin/dashboard',  roles: [ROLES.ADMIN, ROLES.USER] },
+    { label: 'Salas', icon: 'meeting_room', route: '/admin/salas',  roles: [ROLES.ADMIN] },
+    { label: 'Calendario', icon: 'calendar_today', route: '/admin/calendario', roles: [ROLES.ADMIN, ROLES.USER] },
+    { label: 'Equipos', icon: 'computer', route: '/admin/equipos',  roles: [ROLES.ADMIN]},
+    { label: 'Historial Equipos', icon: 'history', route: '/admin/equipo-historial', roles: [ROLES.ADMIN, ROLES.USER] },
+    { label: 'Usuarios', icon: 'people', route: '/usuarios',  roles: [ROLES.ADMIN] },
+    { label: 'Configuración', icon: 'settings', route: '/configuracion',  roles: [ROLES.ADMIN] },
   ];
 
   get filteredMenuItems() {

@@ -1,8 +1,10 @@
-<div class="container-fluid p-3 p-md-4"> <header class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 mb-md-4 gap-3">
-    
-    <h2 class="h4 mb-0 text-center text-md-start">Calendario de Reservas</h2>
-    
-    <div class="d-flex flex-column flex-md-row align-items-center w-100 w-md-auto gap-3">
+<div class="container-fluid p-3 p-md-4">
+  
+  <!-- HEADER -->
+  <header class="mb-4">
+    <!-- Fila Superior: Título y Selector de Sala -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-3">
+      <h2 class="h4 mb-0 text-primary fw-bold text-center text-md-start">Calendario de Reservas</h2>
       
       <div class="w-100 w-md-auto">
         <select class="form-select form-select-sm" (change)="onSalaFilterChange($event)">
@@ -10,16 +12,58 @@
           <option *ngFor="let sala of salas" [value]="sala.id">{{ sala.nombre }}</option>
         </select>
       </div>
+    </div>
 
-      <div class="btn-group w-100 w-md-auto shadow-sm">
-        <button class="btn btn-outline-secondary flex-fill" (click)="setView(CalendarView.Month)" [class.active]="view === CalendarView.Month">Mes</button>
-        <button class="btn btn-outline-secondary flex-fill" (click)="setView(CalendarView.Week)" [class.active]="view === CalendarView.Week">Semana</button>
-        <button class="btn btn-outline-secondary flex-fill" (click)="setView(CalendarView.Day)" [class.active]="view === CalendarView.Day">Día</button>
+    <!-- Fila de Controles: Navegación y Vistas -->
+    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 bg-light p-2 rounded border shadow-sm">
+      
+      <!-- 1. GRUPO NAVEGACIÓN (Hoy, < , >) -->
+      <div class="d-flex align-items-center gap-2 w-100 w-md-auto justify-content-center justify-content-md-start">
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          mwlCalendarToday
+          [(viewDate)]="viewDate"
+          (viewDateChange)="loadReservas()">
+          Hoy
+        </button>
+        
+        <div class="btn-group">
+          <button
+            class="btn btn-icon"
+            mwlCalendarPreviousView
+            [view]="view"
+            [(viewDate)]="viewDate"
+            (viewDateChange)="loadReservas()">
+            <span class="material-icons">chevron_left</span>
+          </button>
+          
+          <button
+            class="btn btn-icon"
+            mwlCalendarNextView
+            [view]="view"
+            [(viewDate)]="viewDate"
+            (viewDateChange)="loadReservas()">
+            <span class="material-icons">chevron_right</span>
+          </button>
+        </div>
+
+        <!-- TÍTULO DE LA FECHA ACTUAL -->
+        <h3 class="h5 mb-0 ms-2 text-capitalize fw-bold text-dark text-nowrap">
+          {{ viewDate | calendarDate:(view + 'ViewTitle'):'es' }}
+        </h3>
+      </div>
+
+      <!-- 2. SELECTOR DE VISTA (Mes, Semana, Día) -->
+      <div class="btn-group w-100 w-md-auto">
+        <button class="btn btn-outline-secondary btn-sm flex-fill" (click)="setView(CalendarView.Month)" [class.active]="view === CalendarView.Month">Mes</button>
+        <button class="btn btn-outline-secondary btn-sm flex-fill" (click)="setView(CalendarView.Week)" [class.active]="view === CalendarView.Week">Semana</button>
+        <button class="btn btn-outline-secondary btn-sm flex-fill" (click)="setView(CalendarView.Day)" [class.active]="view === CalendarView.Day">Día</button>
       </div>
 
     </div>
   </header>
 
+  <!-- CALENDARIO -->
   <div class="bg-white p-2 p-md-4 rounded shadow-sm overflow-hidden">
     <div [ngSwitch]="view">
       <mwl-calendar-month-view
@@ -46,29 +90,36 @@
       ></mwl-calendar-day-view>
     </div>
   </div>
-</div>
 
+</div> 
+<!-- CIERRE DEL CONTAINER-FLUID (Aquí estaba el error antes) -->
+
+<!-- BOTÓN FLOTANTE -->
 <button class="btn btn-primary rounded-circle shadow fab d-flex align-items-center justify-content-center" (click)="openModal()">
   <span style="font-size: 2rem; line-height: 0; margin-top: -4px;">+</span>
 </button>
 
+<!-- MODAL -->
 <div class="modal fade" [class.show]="isModalVisible" [ngStyle]="{'display': isModalVisible ? 'block' : 'none'}" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Nueva Reserva</h5>
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold text-primary">
+          {{ editingReservaId ? 'Editar Reserva' : 'Nueva Reserva' }}
+        </h5>
         <button type="button" class="btn-close" (click)="closeModal()"></button>
       </div>
-      <div class="modal-body">
+      
+      <div class="modal-body p-4">
         <form [formGroup]="reservaForm">
           
-          <div class="row">
-            <div class="col-12 col-md-6 mb-3">
-              <label for="titulo" class="form-label">Título de la Reunión</label>
-              <input id="titulo" formControlName="titulo" type="text" class="form-control" placeholder="Ej. Revisión Q4">
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-md-6">
+              <label for="titulo" class="form-label fw-medium">Título</label>
+              <input id="titulo" formControlName="titulo" type="text" class="form-control" placeholder="Ej. Reunión de Marketing">
             </div>
-            <div class="col-12 col-md-6 mb-3">
-              <label for="sala_id" class="form-label">Sala</label>
+            <div class="col-12 col-md-6">
+              <label for="sala_id" class="form-label fw-medium">Sala</label>
               <select id="sala_id" formControlName="sala_id" class="form-select">
                 <option [ngValue]="null" disabled>Selecciona una sala</option>
                 <option *ngFor="let sala of salas" [ngValue]="sala.id">{{ sala.nombre }}</option>
@@ -76,54 +127,58 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-6 mb-3">
-              <label for="fecha_inicio" class="form-label">Inicio</label>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label for="fecha_inicio" class="form-label fw-medium">Inicio</label>
               <input id="fecha_inicio" formControlName="fecha_inicio" type="datetime-local" class="form-control">
             </div>
-            <div class="col-6 mb-3">
-              <label for="fecha_fin" class="form-label">Fin</label>
+            <div class="col-6">
+              <label for="fecha_fin" class="form-label fw-medium">Fin</label>
               <input id="fecha_fin" formControlName="fecha_fin" type="datetime-local" class="form-control">
             </div>
           </div>
 
           <div class="mb-3">
-            <label for="descripcion" class="form-label">Descripción</label>
-            <textarea id="descripcion" formControlName="descripcion" class="form-control" rows="2"></textarea>
+            <label for="descripcion" class="form-label fw-medium">Descripción</label>
+            <textarea id="descripcion" formControlName="descripcion" class="form-control" rows="3" placeholder="Detalles de la reunión..."></textarea>
           </div>
 
           <div class="mb-3">
-            <label for="invitados" class="form-label">Invitados</label>
+            <label for="invitados" class="form-label fw-medium">Invitados</label>
             <div class="autocomplete-container">
-              <input id="invitados" formControlName="invitadoSearch" type="text" (input)="search($event)" class="form-control" placeholder="Buscar personas...">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                <input id="invitados" formControlName="invitadoSearch" type="text" (input)="search($event)" class="form-control border-start-0" placeholder="Buscar por nombre o correo...">
+              </div>
               
-              <div class="suggestions list-group shadow" *ngIf="(searchSuggestions$ | async) as suggestions">
-                <button type="button" *ngFor="let suggestion of suggestions" class="list-group-item list-group-item-action d-flex align-items-center p-2" (click)="addInvitado(suggestion)">
-                  <img [src]="suggestion.avatar_url || 'assets/icon/user.png'" class="rounded-circle me-2" style="width: 24px; height: 24px;">
-                  <div class="text-truncate">
-                    {{ suggestion.nombre }} <small class="text-muted d-block d-md-inline">({{ suggestion.email }})</small>
+              <div class="suggestions list-group shadow-sm mt-1" *ngIf="(searchSuggestions$ | async) as suggestions">
+                <button type="button" *ngFor="let suggestion of suggestions" class="list-group-item list-group-item-action d-flex align-items-center p-2 border-0 border-bottom" (click)="addInvitado(suggestion)">
+                  <img [src]="suggestion.avatar_url || 'assets/icon/user.png'" class="rounded-circle me-2 border" style="width: 32px; height: 32px; object-fit: cover;">
+                  <div class="d-flex flex-column">
+                    <span class="fw-medium">{{ suggestion.nombre }}</span>
+                    <small class="text-muted">{{ suggestion.email }}</small>
                   </div>
                 </button>
               </div>
             </div>
             
-            <div class="pills-container mt-2 d-flex flex-wrap gap-1">
-              <span *ngFor="let invitado of invitados" class="badge rounded-pill text-bg-secondary fw-normal d-inline-flex align-items-center p-2">
-                <img [src]="invitado.avatar_url || 'assets/icon/user.png'" class="rounded-circle me-1" style="width: 18px; height: 18px;">
+            <div class="pills-container mt-2 d-flex flex-wrap gap-2">
+              <span *ngFor="let invitado of invitados" class="badge rounded-pill bg-white text-dark border shadow-sm d-inline-flex align-items-center py-2 px-3">
+                <img [src]="invitado.avatar_url || 'assets/icon/user.png'" class="rounded-circle me-2" style="width: 20px; height: 20px;">
                 {{ invitado.nombre }}
-                <button type="button" class="btn-close btn-close-white ms-2" (click)="removeInvitado(invitado)"></button>
+                <button type="button" class="btn-close btn-close-dark ms-2" (click)="removeInvitado(invitado)" style="font-size: 0.5em;"></button>
               </span>
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Equipamiento</label>
+            <label class="form-label fw-medium">Equipamiento Adicional</label>
             <div class="p-3 bg-light border rounded" formArrayName="equipos">
               <div class="row g-2">
                 <div *ngFor="let equipo of equipos; let i = index" class="col-6 col-md-4">
-                  <div class="form-check text-truncate">
+                  <div class="form-check">
                     <input [formControlName]="i" type="checkbox" class="form-check-input" id="equipo-{{i}}">
-                    <label class="form-check-label" for="equipo-{{i}}" title="{{ equipo.nombre }}">
+                    <label class="form-check-label text-truncate w-100" for="equipo-{{i}}" title="{{ equipo.nombre }}">
                       {{ equipo.nombre }}
                     </label>
                   </div>
@@ -134,9 +189,12 @@
 
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
-        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="reservaForm.invalid">Guardar</button>
+      
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-outline-secondary px-4" (click)="closeModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary px-4" (click)="onSubmit()" [disabled]="reservaForm.invalid">
+          {{ editingReservaId ? 'Actualizar' : 'Crear Reserva' }}
+        </button>
       </div>
     </div>
   </div>

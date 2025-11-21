@@ -4,13 +4,12 @@
 }
 
 /* --- ESTILOS DE TARJETA Y CONTENEDOR --- */
-/* Si usas la clase .card de Bootstrap, esto es un refuerzo o personalización */
 .card {
   background-color: var(--card-background-color, #ffffff);
   border: none;
-  border-radius: 12px; /* Bordes más suaves */
+  border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden; /* Para que la tabla no se salga en las esquinas */
+  overflow: hidden;
 }
 
 .card-header {
@@ -41,16 +40,72 @@
   transform: scale(0.95);
 }
 
-/* --- AUMENTAR TAMAÑO DE "BOLITAS" DE EVENTOS --- */
+/* --- PERSONALIZACIÓN DEL CALENDARIO --- */
+
+/* 1. Bolitas de eventos más grandes */
 ::ng-deep .cal-month-view .cal-day-cell .cal-events .cal-event {
-  width: 17px;       /* Ancho más grande (default es ~10px) */
-  height: 17px;      /* Alto más grande */
-  margin: 2px;       /* Un poco más de separación entre ellas */
+  width: 16px;
+  height: 16px;
+  margin: 2px;
+  border-radius: 50%;
+}
+
+/* 2. Triángulo indicador de EQUIPO (FALTABA ESTO) */
+::ng-deep .cal-event.con-equipo {
+  position: relative; /* Necesario para posicionar el triangulo */
+}
+
+::ng-deep .cal-month-view .cal-day-cell .cal-events .cal-event.con-equipo::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 8px 8px 0; /* Tamaño del triangulo */
+  border-color: transparent #ffc107 transparent transparent; /* Color dorado */
+  z-index: 10;
+}
+
+/* --- BOTONES DE NAVEGACIÓN (ESTILO GOOGLE) --- */
+.btn-icon {
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  color: #5f6368;
+  cursor: pointer;
+}
+
+.btn-icon:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #202124;
+}
+
+.btn-icon .material-icons {
+  font-size: 24px;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+/* --- TABLAS (Mejoras visuales) --- */
+.table th, .table td {
+  padding: 12px 16px;
+  white-space: nowrap; /* Escritorio: No romper líneas */
 }
 
 /* --- RESPONSIVE (MÓVIL) --- */
 @media (max-width: 768px) {
-  /* En móvil, ajustamos el FAB */
+  
+  /* Ajuste del FAB */
   .fab {
     width: 50px;
     height: 50px;
@@ -59,34 +114,29 @@
     font-size: 1.5rem;
   }
 
-  /* Ajustes de la tarjeta en móvil */
+  /* Ajuste del Header de tarjeta */
   .card-header {
     padding: 12px 16px;
   }
   
-  /* Si tienes botones de acción en la cabecera, que se apilen */
-  .header {
+  /* Ajuste del Header Principal (Usando etiqueta header o clase .header) */
+  header, .header { 
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
+
+  /* Ajuste de celdas del calendario para dedos */
+  ::ng-deep .cal-month-view .cal-day-cell {
+    min-height: 60px; 
+  }
 }
 
-/* --- TABLAS (Mejoras visuales) --- */
-/* Asegura que el contenido de la tabla no quede pegado */
-.table th, .table td {
-  padding: 12px 16px;
-  white-space: nowrap; /* Evita que el texto se rompa feo en escritorio */
-}
-
-/* En pantallas pequeñas, permitimos que el texto se rompa si es necesario */
 @media (max-width: 576px) {
+  /* En pantallas muy pequeñas, permitimos romper texto en tablas */
   .table th, .table td {
     white-space: normal; 
     font-size: 14px;
     padding: 8px 10px;
   }
-  
-  /* Ocultar columnas menos importantes en móvil  */
-  /* .d-none-mobile { display: none; } */
 }

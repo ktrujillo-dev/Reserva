@@ -216,10 +216,8 @@ export class CalendarioComponent implements OnInit, OnDestroy {
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (isSameMonth(date, this.viewDate)) {
-      if ((isSameDay(this.viewDate, date) && this.view !== CalendarView.Day) || events.length === 0) {
         this.viewDate = date;
         this.view = CalendarView.Day;
-      }
     }
   }
 
